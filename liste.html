@@ -1,0 +1,35 @@
+{% extends 'base.html' %}{% block title %}Offres de stage{% endblock %}
+{% block content %}
+<div style="background:var(--sidebar);padding:2rem;color:#fff;text-align:center">
+  <h1 style="font-size:1.8rem;font-weight:800">Offres de stage</h1>
+  <form method="get" style="display:flex;gap:.8rem;justify-content:center;margin-top:1rem;flex-wrap:wrap">
+    <input type="text" name="q" value="{{ q }}" placeholder="Rechercher..." style="padding:.6rem 1rem;border-radius:10px;border:none;width:300px;font-size:.9rem">
+    <select name="type" style="padding:.6rem 1rem;border-radius:10px;border:none;font-size:.9rem">
+      <option value="">Tous les types</option>
+      <option value="INITIATION" {% if type_f == 'INITIATION' %}selected{% endif %}>Initiation</option>
+      <option value="PERFECTIONNEMENT" {% if type_f == 'PERFECTIONNEMENT' %}selected{% endif %}>Perfectionnement</option>
+      <option value="PFA" {% if type_f == 'PFA' %}selected{% endif %}>PFA</option>
+      <option value="PFE" {% if type_f == 'PFE' %}selected{% endif %}>PFE</option>
+    </select>
+    <button type="submit" class="btn-primary"><i class="fas fa-search"></i> Filtrer</button>
+  </form>
+</div>
+<div class="section">
+  <p style="color:var(--text-muted);margin-bottom:1.5rem">{{ offres.count }} offre(s) trouvée(s)</p>
+  <div class="offres-grid">{% for offre in offres %}
+  <div class="offre-card">
+    <div class="offre-card-header"><div><div class="offre-title">{{ offre.titre }}</div>
+    <div class="offre-company">{% with p=offre.entreprise.entreprise_profile %}🏢 {{ p.nom_entreprise }}{% endwith %}</div></div>
+    <span class="badge badge-{{ offre.type_stage|lower }}">{{ offre.get_type_stage_display }}</span></div>
+    <p class="offre-desc">{{ offre.description|truncatechars:120 }}</p>
+    <div class="offre-meta">
+      <span class="badge" style="background:#f1f5f9;color:#475569"><i class="fas fa-clock"></i> {{ offre.duree }} mois</span>
+      <span class="badge" style="background:#f1f5f9;color:#475569"><i class="fas fa-tag"></i> {{ offre.domaine }}</span>
+      {% if offre.remuneration and offre.remuneration > 0 %}<span class="badge badge-acceptee">{{ offre.remuneration }} MAD</span>{% else %}<span class="badge badge-refusee">Non rémunéré</span>{% endif %}
+    </div>
+    <div class="offre-footer">
+      <span style="font-size:.78rem;color:var(--text-muted)"><i class="fas fa-calendar-times"></i> {{ offre.date_limite|date:"d/m/Y" }}</span>
+      <a href="/offres/{{ offre.pk }}/" class="btn-primary" style="padding:.4rem .9rem;font-size:.82rem">Voir <i class="fas fa-arrow-right"></i></a>
+    </div>
+  </div>{% empty %}<p style="color:var(--text-muted);text-align:center;padding:3rem;grid-column:1/-1">Aucune offre trouvée.</p>{% endfor %}</div>
+</div>{% endblock %}

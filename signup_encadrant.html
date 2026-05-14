@@ -1,0 +1,11 @@
+{% extends 'base.html' %}{% block title %}Inscription{% endblock %}
+{% block content %}
+<div style="max-width:560px;margin:2rem auto;padding:0 1rem">
+<div class="card">
+  <h2 style="margin-bottom:1.5rem;text-align:center">📝 Créer un compte</h2>
+  <form method="post">{% csrf_token %}
+    {% for field in form %}<div class="form-group"><label>{{ field.label }}</label>{{ field }}{% if field.errors %}<div class="form-error">{{ field.errors.0 }}</div>{% endif %}</div>{% endfor %}
+    <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:1rem"><i class="fas fa-user-plus"></i> Créer mon compte</button>
+  </form>
+  <p style="text-align:center;margin-top:1rem;color:var(--text-muted);font-size:.88rem">Déjà inscrit ? <a href="/login/" style="color:var(--primary)">Se connecter</a></p>
+</div></div>{% endblock %}

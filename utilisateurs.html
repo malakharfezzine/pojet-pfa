@@ -1,0 +1,26 @@
+{% extends 'base.html' %}{% block title %}Utilisateurs{% endblock %}
+{% block content %}
+<div class="dashboard-layout">
+<aside class="sidebar">
+  <div class="sidebar-user"><div class="user-avatar">⚙️</div><div class="user-name">Administration</div></div>
+  <nav class="sidebar-nav">
+    <a href="/dashboard/admin/" class="sidebar-link"><i class="fas fa-home"></i> Dashboard</a>
+    <a href="/admin-panel/entreprises/" class="sidebar-link"><i class="fas fa-building"></i> Entreprises</a>
+    <a href="/admin-panel/utilisateurs/" class="sidebar-link active"><i class="fas fa-users"></i> Utilisateurs</a>
+    <a href="/logout/" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+  </nav>
+</aside>
+<main class="dashboard-main">
+  <div class="page-header"><h1>Tous les utilisateurs 👥</h1><span style="background:var(--primary);color:#fff;padding:.4rem 1rem;border-radius:20px;font-weight:700">{{ users.count }} total</span></div>
+  <div class="card"><div style="overflow-x:auto"><table class="table">
+    <thead><tr><th>Nom</th><th>Username</th><th>Email</th><th>Rôle</th><th>Inscription</th><th>Actif</th></tr></thead>
+    <tbody>{% for u in users %}<tr>
+      <td><strong>{{ u.get_full_name|default:u.username }}</strong></td>
+      <td><code>{{ u.username }}</code></td>
+      <td style="color:var(--text-muted);font-size:.82rem">{{ u.email }}</td>
+      <td><span class="badge {% if u.role == 'ETUDIANT' %}badge-acceptee{% elif u.role == 'ENTREPRISE' %}badge-examen{% elif u.role == 'ENCADRANT' %}badge-pfa{% else %}badge-en_cours{% endif %}">{{ u.role }}</span></td>
+      <td style="color:var(--text-muted);font-size:.82rem">{{ u.date_joined|date:"d/m/Y" }}</td>
+      <td>{% if u.is_active %}<span style="color:#10b981">✅</span>{% else %}<span style="color:#ef4444">❌</span>{% endif %}</td>
+    </tr>{% endfor %}</tbody>
+  </table></div></div>
+</main></div>{% endblock %}

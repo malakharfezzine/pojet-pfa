@@ -1,0 +1,15 @@
+{% extends 'base.html' %}{% block title %}Postuler{% endblock %}
+{% block content %}
+<div style="max-width:700px;margin:2rem auto;padding:0 1rem">
+  <div class="card">
+    <h2 style="margin-bottom:.5rem">📝 Postuler à : {{ offre.titre }}</h2>
+    <p style="color:var(--text-muted);margin-bottom:1.5rem">{% with p=offre.entreprise.entreprise_profile %}{{ p.nom_entreprise }}{% endwith %} — {{ offre.get_type_stage_display }}</p>
+    <form method="post">{% csrf_token %}
+      {% for field in form %}<div class="form-group"><label>{{ field.label }}</label>{{ field }}{% if field.errors %}<div class="form-error">{{ field.errors.0 }}</div>{% endif %}</div>{% endfor %}
+      <div style="display:flex;gap:1rem;margin-top:1.5rem">
+        <button type="submit" class="btn-primary" style="flex:1;justify-content:center"><i class="fas fa-paper-plane"></i> Envoyer ma candidature</button>
+        <a href="/offres/{{ offre.pk }}/" class="btn-secondary">Annuler</a>
+      </div>
+    </form>
+  </div>
+</div>{% endblock %}

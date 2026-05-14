@@ -1,0 +1,18 @@
+{% extends 'base.html' %}{% block title %}Candidatures — {{ offre.titre }}{% endblock %}
+{% block content %}
+<div style="max-width:1000px;margin:2rem auto;padding:0 1rem">
+  <div class="page-header"><h1>Candidatures pour « {{ offre.titre }} »</h1><a href="/dashboard/entreprise/" class="btn-secondary"><i class="fas fa-arrow-left"></i> Retour</a></div>
+  <div class="card">
+    {% if candidatures %}<div style="overflow-x:auto"><table class="table">
+      <thead><tr><th>Étudiant</th><th>Filière</th><th>Date</th><th>Statut</th><th>Action</th></tr></thead>
+      <tbody>{% for c in candidatures %}<tr>
+        <td><strong>{{ c.etudiant.get_full_name }}</strong><br><small style="color:var(--text-muted)">@{{ c.etudiant.username }}</small></td>
+        <td>{% with p=c.etudiant.student_profile %}{{ p.filiere }} — {{ p.get_niveau_display }}{% endwith %}</td>
+        <td style="color:var(--text-muted);font-size:.82rem">{{ c.date_postulation|date:"d/m/Y" }}</td>
+        <td><span class="badge badge-{{ c.statut|lower }}">{{ c.get_statut_display }}</span></td>
+        <td><a href="/candidatures/{{ c.pk }}/traiter/" class="btn-primary" style="padding:.35rem .8rem;font-size:.8rem"><i class="fas fa-edit"></i> Traiter</a></td>
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}<p style="text-align:center;color:var(--text-muted);padding:2rem">Aucune candidature reçue pour cette offre.</p>{% endif %}
+  </div>
+</div>{% endblock %}

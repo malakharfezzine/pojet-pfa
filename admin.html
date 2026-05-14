@@ -1,0 +1,108 @@
+{% extends 'base.html' %}{% block title %}Dashboard Admin{% endblock %}
+{% block content %}
+<div class="dashboard-layout">
+<aside class="sidebar">
+  <div class="sidebar-user"><div class="user-avatar">⚙️</div><div class="user-name">{{ request.user.get_full_name }}</div><div class="user-role">Administrateur</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-title">ADMINISTRATION</div>
+    <a href="/dashboard/admin/" class="sidebar-link active"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a>
+    <a href="/admin-panel/entreprises/" class="sidebar-link"><i class="fas fa-building"></i> Entreprises</a>
+    <a href="/admin-panel/utilisateurs/" class="sidebar-link"><i class="fas fa-users"></i> Utilisateurs</a>
+    <a href="/offres/" class="sidebar-link"><i class="fas fa-briefcase"></i> Offres</a>
+    <a href="/admin/" class="sidebar-link"><i class="fas fa-cog"></i> Panel Django</a>
+    <div class="nav-section-title">COMPTE</div>
+    <a href="/notifications/" class="sidebar-link"><i class="fas fa-bell"></i> Notifications</a>
+    <a href="/logout/" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+  </nav>
+</aside>
+<main class="dashboard-main">
+  <div class="page-header">
+    <h1>Dashboard Admin ⚙️</h1>
+    {% if stats.entreprises_attente > 0 %}
+    <span style="background:#ef4444;color:#fff;padding:.4rem 1rem;border-radius:20px;font-size:.85rem;font-weight:700">
+      <i class="fas fa-exclamation-triangle"></i> {{ stats.entreprises_attente }} entreprise(s) en attente
+    </span>
+    {% endif %}
+  </div>
+
+  <!-- Stats globales -->
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(99,102,241,.15)"><i class="fas fa-user-graduate" style="color:#6366f1"></i></div><div><div class="stat-number">{{ stats.etudiants }}</div><div class="stat-label">Étudiants</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,.15)"><i class="fas fa-building" style="color:#f59e0b"></i></div><div><div class="stat-number">{{ stats.entreprises }}</div><div class="stat-label">Entreprises</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,.15)"><i class="fas fa-chalkboard-teacher" style="color:#10b981"></i></div><div><div class="stat-number">{{ stats.encadrants }}</div><div class="stat-label">Encadrants</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(139,92,246,.15)"><i class="fas fa-briefcase" style="color:#8b5cf6"></i></div><div><div class="stat-number">{{ stats.offres_actives }}</div><div class="stat-label">Offres actives</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(59,130,246,.15)"><i class="fas fa-paper-plane" style="color:#3b82f6"></i></div><div><div class="stat-number">{{ stats.candidatures }}</div><div class="stat-label">Candidatures</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(236,72,153,.15)"><i class="fas fa-graduation-cap" style="color:#ec4899"></i></div><div><div class="stat-number">{{ stats.stages_en_cours }}</div><div class="stat-label">Stages en cours</div></div></div>
+  </div>
+
+  <div class="admin-chart-row">
+    <!-- Entreprises en attente -->
+    <div class="card">
+      <h3><i class="fas fa-clock" style="color:#f59e0b"></i> Entreprises en attente de validation</h3>
+      {% if entreprises_attente %}
+        {% for ep in entreprises_attente %}
+        <div class="activity-item">
+          <div class="activity-avatar" style="background:#f59e0b">🏢</div>
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:.88rem">{{ ep.nom_entreprise }}</div>
+            <div style="color:var(--text-muted);font-size:.78rem">{{ ep.secteur }} — {{ ep.user.email }}</div>
+          </div>
+          <a href="/admin-panel/entreprises/{{ ep.pk }}/valider/" class="btn-success" style="font-size:.78rem;padding:.3rem .7rem">
+            <i class="fas fa-check"></i> Valider
+          </a>
+        </div>
+        {% endfor %}
+        <div style="text-align:right;margin-top:.8rem"><a href="/admin-panel/entreprises/" class="btn-secondary" style="font-size:.82rem">Tout voir <i class="fas fa-arrow-right"></i></a></div>
+      {% else %}
+        <p style="color:var(--text-muted);text-align:center;padding:1.5rem"><i class="fas fa-check-circle" style="color:#10b981"></i> Toutes les entreprises sont validées</p>
+      {% endif %}
+    </div>
+
+    <!-- Inscrits récents -->
+    <div class="card">
+      <h3><i class="fas fa-user-plus" style="color:var(--primary)"></i> Derniers inscrits</h3>
+      {% for u in inscrits_recents %}
+      <div class="activity-item">
+        <div class="activity-avatar">{{ u.first_name|first }}{{ u.last_name|first }}</div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:.88rem">{{ u.get_full_name }}</div>
+          <div style="color:var(--text-muted);font-size:.78rem">@{{ u.username }} — {{ u.get_role_display }}</div>
+        </div>
+        <span class="badge {% if u.role == 'ETUDIANT' %}badge-acceptee{% elif u.role == 'ENTREPRISE' %}badge-examen{% elif u.role == 'ENCADRANT' %}badge-pfa{% else %}badge-en_cours{% endif %}" style="font-size:.72rem">{{ u.role }}</span>
+      </div>
+      {% endfor %}
+      <div style="text-align:right;margin-top:.8rem"><a href="/admin-panel/utilisateurs/" class="btn-secondary" style="font-size:.82rem">Tout voir <i class="fas fa-arrow-right"></i></a></div>
+    </div>
+  </div>
+
+  <!-- Candidatures récentes -->
+  <div class="card">
+    <h3><i class="fas fa-paper-plane" style="color:var(--primary)"></i> Candidatures récentes</h3>
+    <div style="overflow-x:auto">
+    <table class="table">
+      <thead><tr><th>Étudiant</th><th>Offre</th><th>Entreprise</th><th>Date</th><th>Statut</th></tr></thead>
+      <tbody>
+      {% for c in candidatures_recentes %}
+      <tr>
+        <td><strong>{{ c.etudiant.get_full_name }}</strong></td>
+        <td>{{ c.offre.titre|truncatechars:40 }}</td>
+        <td>{% with p=c.offre.entreprise.entreprise_profile %}{{ p.nom_entreprise }}{% endwith %}</td>
+        <td style="color:var(--text-muted);font-size:.82rem">{{ c.date_postulation|date:"d/m/Y" }}</td>
+        <td><span class="badge badge-{{ c.statut|lower }}">{{ c.get_statut_display }}</span></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- Stats stages -->
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(59,130,246,.15)"><i class="fas fa-play-circle" style="color:#3b82f6"></i></div><div><div class="stat-number">{{ stats.stages_en_cours }}</div><div class="stat-label">Stages en cours</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,.15)"><i class="fas fa-flag-checkered" style="color:#f59e0b"></i></div><div><div class="stat-number">{{ stats.stages_termines }}</div><div class="stat-label">Stages terminés</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,.15)"><i class="fas fa-check-double" style="color:#10b981"></i></div><div><div class="stat-number">{{ stats.entreprises_validees }}</div><div class="stat-label">Entreprises validées</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(239,68,68,.15)"><i class="fas fa-hourglass-half" style="color:#ef4444"></i></div><div><div class="stat-number">{{ stats.entreprises_attente }}</div><div class="stat-label">En attente validation</div></div></div>
+  </div>
+</main>
+</div>
+{% endblock %}

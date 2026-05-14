@@ -1,0 +1,26 @@
+{% extends 'base.html' %}{% block title %}{{ offre.titre }}{% endblock %}
+{% block content %}
+<div style="max-width:900px;margin:2rem auto;padding:0 1rem">
+  <div class="offre-detail-header">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem">
+      <div><h1 style="font-size:1.6rem;font-weight:800;margin-bottom:.5rem">{{ offre.titre }}</h1>
+      <div style="font-size:1rem;color:#94a3b8">🏢 {% with p=offre.entreprise.entreprise_profile %}{{ p.nom_entreprise }} — {{ p.secteur }}{% endwith %}</div></div>
+      <span class="badge badge-{{ offre.type_stage|lower }}" style="font-size:.9rem;padding:.4rem 1rem">{{ offre.get_type_stage_display }}</span>
+    </div>
+    <div style="display:flex;gap:1.5rem;margin-top:1.5rem;flex-wrap:wrap">
+      <span style="color:#94a3b8"><i class="fas fa-clock"></i> {{ offre.duree }} mois</span>
+      <span style="color:#94a3b8"><i class="fas fa-tag"></i> {{ offre.domaine }}</span>
+      {% if offre.remuneration and offre.remuneration > 0 %}<span style="color:#10b981;font-weight:700"><i class="fas fa-money-bill-wave"></i> {{ offre.remuneration }} MAD/mois</span>{% endif %}
+      <span style="color:#ef4444"><i class="fas fa-calendar-times"></i> Limite : {{ offre.date_limite|date:"d/m/Y" }}</span>
+    </div>
+  </div>
+  <div class="card"><h3>Description</h3><p style="line-height:1.8;color:var(--text-muted)">{{ offre.description }}</p></div>
+  {% if offre.competences %}<div class="card"><h3>Compétences requises</h3><p style="line-height:1.8;color:var(--text-muted)">{{ offre.competences }}</p></div>{% endif %}
+  <div style="text-align:center;margin-top:1.5rem">
+    {% if user.is_authenticated and user.role == 'ETUDIANT' %}
+      {% if deja_postule %}<span class="badge badge-acceptee" style="font-size:1rem;padding:.6rem 1.5rem">✅ Déjà postulé</span>
+      {% else %}<a href="/offres/{{ offre.pk }}/postuler/" class="btn-primary" style="font-size:1rem;padding:.8rem 2rem"><i class="fas fa-paper-plane"></i> Postuler</a>{% endif %}
+    {% elif not user.is_authenticated %}<a href="/login/" class="btn-primary" style="font-size:1rem;padding:.8rem 2rem">Connectez-vous pour postuler</a>{% endif %}
+    <a href="/offres/" class="btn-secondary" style="margin-left:1rem"><i class="fas fa-arrow-left"></i> Retour</a>
+  </div>
+</div>{% endblock %}

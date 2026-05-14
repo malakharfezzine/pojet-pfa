@@ -1,0 +1,37 @@
+{% load notif_tags %}<!DOCTYPE html>
+<html lang="fr"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>{% block title %}PortailStages 2026{% endblock %}</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{% block extra_css %}{% endblock %}</head>
+<body>
+<nav class="navbar">
+  <a href="/" class="navbar-brand">🎓 Portail<span>Stages</span></a>
+  <div class="nav-links">
+    <a href="/offres/" class="nav-link"><i class="fas fa-briefcase"></i> Offres</a>
+    {% if user.is_authenticated %}
+      {% if user.role == 'ETUDIANT' %}<a href="/dashboard/etudiant/" class="nav-link">Mon espace</a>
+      {% elif user.role == 'ENTREPRISE' %}<a href="/dashboard/entreprise/" class="nav-link">Mon espace</a>
+      {% elif user.role == 'ENCADRANT' %}<a href="/dashboard/encadrant/" class="nav-link">Mon espace</a>
+      {% elif user.is_superuser or user.role == 'ADMIN' %}
+        <a href="/dashboard/admin/" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="/admin-panel/entreprises/" class="nav-link">Entreprises</a>
+        <a href="/admin-panel/utilisateurs/" class="nav-link">Utilisateurs</a>
+      {% endif %}
+      {% notif_count user as nb %}
+      <div class="notif-bell">
+        <a href="/notifications/" title="Notifications"><i class="fas fa-bell"></i></a>
+        {% if nb > 0 %}<span class="notif-badge">{{ nb }}</span>{% endif %}
+      </div>
+      <a href="/logout/" class="btn-nav-outline"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+    {% else %}
+      <a href="/login/" class="nav-link">Connexion</a>
+      <a href="/signup/etudiant/" class="btn-nav">S'inscrire</a>
+    {% endif %}
+  </div>
+</nav>
+{% if messages %}<div class="alerts">{% for m in messages %}<div class="alert alert-{{ m.tags }}"><i class="fas fa-info-circle"></i> {{ m }}</div>{% endfor %}</div>{% endif %}
+{% block content %}{% endblock %}
+<footer><p>🎓 <span>PortailStages</span> &copy; 2026 — Portail de Gestion des Stages — ENSA Casablanca</p></footer>
+</body></html>

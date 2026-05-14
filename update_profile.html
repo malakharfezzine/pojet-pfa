@@ -1,0 +1,14 @@
+{% extends 'base.html' %}{% block title %}Mon Profil{% endblock %}
+{% block content %}
+<div style="max-width:600px;margin:2rem auto;padding:0 1rem">
+<div class="card">
+  <h2 style="margin-bottom:1.5rem">👤 Mon profil & CV</h2>
+  {% if profile.cv %}<div class="alert alert-success" style="margin-bottom:1rem"><i class="fas fa-check-circle"></i> CV : <a href="{{ profile.cv.url }}" target="_blank">Voir mon CV actuel</a></div>{% else %}<div class="alert alert-warning" style="margin-bottom:1rem"><i class="fas fa-exclamation-triangle"></i> Aucun CV uploadé.</div>{% endif %}
+  <form method="post" enctype="multipart/form-data">{% csrf_token %}
+    {% for field in form %}<div class="form-group"><label>{{ field.label }}</label>{{ field }}</div>{% endfor %}
+    <div style="display:flex;gap:1rem;margin-top:1.5rem">
+      <button type="submit" class="btn-primary" style="flex:1;justify-content:center"><i class="fas fa-save"></i> Enregistrer</button>
+      <a href="/dashboard/etudiant/" class="btn-secondary">Retour</a>
+    </div>
+  </form>
+</div></div>{% endblock %}

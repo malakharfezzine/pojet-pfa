@@ -1,0 +1,27 @@
+{% extends 'base.html' %}{% block title %}Gestion Entreprises{% endblock %}
+{% block content %}
+<div class="dashboard-layout">
+<aside class="sidebar">
+  <div class="sidebar-user"><div class="user-avatar">⚙️</div><div class="user-name">Administration</div><div class="user-role">Administrateur</div></div>
+  <nav class="sidebar-nav">
+    <a href="/dashboard/admin/" class="sidebar-link"><i class="fas fa-home"></i> Dashboard</a>
+    <a href="/admin-panel/entreprises/" class="sidebar-link active"><i class="fas fa-building"></i> Entreprises</a>
+    <a href="/admin-panel/utilisateurs/" class="sidebar-link"><i class="fas fa-users"></i> Utilisateurs</a>
+    <a href="/logout/" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+  </nav>
+</aside>
+<main class="dashboard-main">
+  <div class="page-header"><h1>Gestion des Entreprises 🏢</h1>{% if nb_en_attente > 0 %}<span style="background:#ef4444;color:#fff;padding:.4rem 1rem;border-radius:20px;font-weight:700">{{ nb_en_attente }} en attente</span>{% endif %}</div>
+  <div class="card"><div style="overflow-x:auto"><table class="table">
+    <thead><tr><th>Entreprise</th><th>Secteur</th><th>ICE</th><th>Contact</th><th>Offres</th><th>Statut</th><th>Action</th></tr></thead>
+    <tbody>{% for ep in entreprises %}<tr>
+      <td><strong>{{ ep.nom_entreprise }}</strong><br><small style="color:var(--text-muted)">{{ ep.user.email }}</small></td>
+      <td>{{ ep.secteur }}</td>
+      <td><code>{{ ep.ice }}</code></td>
+      <td>{{ ep.telephone|default:"—" }}</td>
+      <td>{{ ep.user.offres.count }}</td>
+      <td>{% if ep.valide %}<span class="badge badge-acceptee">✅ Validée</span>{% else %}<span class="badge badge-examen">⏳ En attente</span>{% endif %}</td>
+      <td><a href="/admin-panel/entreprises/{{ ep.pk }}/valider/" class="{% if ep.valide %}btn-danger{% else %}btn-success{% endif %}" style="padding:.35rem .7rem;font-size:.78rem" onclick="return confirm('Confirmer ?')">{% if ep.valide %}<i class="fas fa-ban"></i> Suspendre{% else %}<i class="fas fa-check"></i> Valider{% endif %}</a></td>
+    </tr>{% endfor %}</tbody>
+  </table></div></div>
+</main></div>{% endblock %}

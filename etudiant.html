@@ -1,0 +1,52 @@
+{% extends 'base.html' %}{% block title %}Dashboard Étudiant{% endblock %}
+{% block content %}
+<div class="dashboard-layout">
+<aside class="sidebar">
+  <div class="sidebar-user"><div class="user-avatar">🎓</div><div class="user-name">{{ request.user.get_full_name }}</div><div class="user-role">{{ profile.filiere }} — {{ profile.get_niveau_display }}</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-title">NAVIGATION</div>
+    <a href="/dashboard/etudiant/" class="sidebar-link active"><i class="fas fa-home"></i> Tableau de bord</a>
+    <a href="/offres/" class="sidebar-link"><i class="fas fa-briefcase"></i> Offres de stage</a>
+    <div class="nav-section-title">COMPTE</div>
+    <a href="/profil/cv/" class="sidebar-link"><i class="fas fa-user-edit"></i> Mon profil / CV</a>
+    <a href="/notifications/" class="sidebar-link"><i class="fas fa-bell"></i> Notifications {% if nb_notifs > 0 %}<span class="notif-badge" style="position:static;margin-left:.3rem">{{ nb_notifs }}</span>{% endif %}</a>
+    <a href="/logout/" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+  </nav>
+</aside>
+<main class="dashboard-main">
+  <div class="page-header">
+    <h1>Bonjour, {{ request.user.first_name }} 👋</h1>
+    <a href="/offres/" class="btn-primary"><i class="fas fa-search"></i> Chercher un stage</a>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(99,102,241,.15)"><i class="fas fa-paper-plane" style="color:#6366f1"></i></div><div><div class="stat-number">{{ candidatures.count }}</div><div class="stat-label">Candidatures</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,.15)"><i class="fas fa-hourglass" style="color:#f59e0b"></i></div><div><div class="stat-number">{{ candidatures|length }}</div><div class="stat-label">En examen</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,.15)"><i class="fas fa-check-circle" style="color:#10b981"></i></div><div><div class="stat-number">{{ candidatures|length }}</div><div class="stat-label">Acceptées</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(139,92,246,.15)"><i class="fas fa-file-pdf" style="color:#8b5cf6"></i></div><div><div class="stat-number">{% if profile.cv %}✅{% else %}—{% endif %}</div><div class="stat-label">CV uploadé</div></div></div>
+  </div>
+  <div class="card">
+    <h3><i class="fas fa-list"></i> Mes candidatures <span style="background:var(--primary);color:#fff;border-radius:20px;padding:.1rem .6rem;font-size:.75rem">{{ candidatures.count }}</span></h3>
+    {% if candidatures %}
+    <div style="overflow-x:auto"><table class="table">
+      <thead><tr><th>Stage</th><th>Entreprise</th><th>Type</th><th>Date</th><th>Statut</th></tr></thead>
+      <tbody>{% for c in candidatures %}<tr>
+        <td><strong>{{ c.offre.titre }}</strong></td>
+        <td>{% with p=c.offre.entreprise.entreprise_profile %}{{ p.nom_entreprise }}{% endwith %}</td>
+        <td><span class="badge badge-{{ c.offre.type_stage|lower }}">{{ c.offre.get_type_stage_display }}</span></td>
+        <td style="color:var(--text-muted);font-size:.82rem">{{ c.date_postulation|date:"d/m/Y" }}</td>
+        <td><span class="badge badge-{{ c.statut|lower }}">{{ c.get_statut_display }}</span></td>
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}<p style="color:var(--text-muted);text-align:center;padding:2rem">Aucune candidature pour le moment. <a href="/offres/" style="color:var(--primary)">Parcourir les offres</a></p>{% endif %}
+  </div>
+  <div class="card">
+    <h3><i class="fas fa-fire" style="color:#f59e0b"></i> Offres pour vous</h3>
+    <div class="offres-grid">{% for offre in offres_suggerees %}
+    <div class="offre-card">
+      <div class="offre-title">{{ offre.titre }}</div>
+      <div class="offre-company" style="margin-bottom:.5rem">{% with p=offre.entreprise.entreprise_profile %}{{ p.nom_entreprise }}{% endwith %}</div>
+      <div class="offre-meta"><span class="badge badge-{{ offre.type_stage|lower }}">{{ offre.get_type_stage_display }}</span><span class="badge" style="background:#f1f5f9;color:#475569">{{ offre.duree }} mois</span></div>
+      <div style="text-align:right;margin-top:.8rem"><a href="/offres/{{ offre.pk }}/" class="btn-primary" style="font-size:.82rem;padding:.4rem .9rem">Voir <i class="fas fa-arrow-right"></i></a></div>
+    </div>{% endfor %}</div>
+  </div>
+</main></div>{% endblock %}

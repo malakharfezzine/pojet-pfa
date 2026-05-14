@@ -1,0 +1,21 @@
+{% extends 'base.html' %}{% block title %}Évaluer Stage{% endblock %}
+{% block content %}
+<div class="dashboard-layout">
+<aside class="sidebar">
+  <div class="sidebar-user"><div class="user-avatar">👨‍🏫</div><div class="user-name">{{ request.user.get_full_name }}</div><div class="user-role">Encadrant</div></div>
+  <nav class="sidebar-nav">
+    <a href="/dashboard/encadrant/" class="sidebar-link"><i class="fas fa-arrow-left"></i> Retour</a>
+  </nav>
+</aside>
+<main class="dashboard-main">
+  <div class="page-header"><h1>Évaluer le stage ✏️</h1></div>
+  <div class="card" style="max-width:600px">
+    <h3>{{ stage.candidature.etudiant.get_full_name }} — {{ stage.candidature.offre.titre }}</h3>
+    <form method="post">{% csrf_token %}
+      {% for field in form %}
+      <div class="form-group"><label>{{ field.label }}</label>{{ field }}{% if field.errors %}<div class="form-error">{{ field.errors.0 }}</div>{% endif %}</div>
+      {% endfor %}
+      <button type="submit" class="btn-primary" style="width:100%"><i class="fas fa-save"></i> Enregistrer l'évaluation</button>
+    </form>
+  </div>
+</main></div>{% endblock %}

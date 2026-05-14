@@ -1,0 +1,55 @@
+{% extends 'base.html' %}{% block title %}Dashboard Entreprise{% endblock %}
+{% block content %}
+<div class="dashboard-layout">
+<aside class="sidebar">
+  <div class="sidebar-user"><div class="user-avatar">🏢</div><div class="user-name">{{ profile.nom_entreprise }}</div><div class="user-role">{{ profile.secteur }}</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-title">NAVIGATION</div>
+    <a href="/dashboard/entreprise/" class="sidebar-link active"><i class="fas fa-home"></i> Tableau de bord</a>
+    <a href="/offres/creer/" class="sidebar-link"><i class="fas fa-plus-circle"></i> Publier une offre</a>
+    <div class="nav-section-title">COMPTE</div>
+    <a href="/notifications/" class="sidebar-link"><i class="fas fa-bell"></i> Notifications</a>
+    <a href="/logout/" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+  </nav>
+</aside>
+<main class="dashboard-main">
+  {% if not profile.valide %}<div class="alerts"><div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> <strong>Compte en attente de validation.</strong> Vous ne pouvez pas publier d'offres tant que votre compte n'est pas approuvé par l'administration.</div></div>{% endif %}
+  <div class="page-header"><h1>Bonjour, {{ request.user.first_name }} 🏢</h1>
+    {% if profile.valide %}<a href="/offres/creer/" class="btn-primary"><i class="fas fa-plus"></i> Publier une offre</a>{% endif %}
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(99,102,241,.15)"><i class="fas fa-briefcase" style="color:#6366f1"></i></div><div><div class="stat-number">{{ stats.offres }}</div><div class="stat-label">Offres publiées</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,.15)"><i class="fas fa-users" style="color:#f59e0b"></i></div><div><div class="stat-number">{{ stats.candidatures }}</div><div class="stat-label">Candidatures reçues</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(239,68,68,.15)"><i class="fas fa-clock" style="color:#ef4444"></i></div><div><div class="stat-number">{{ stats.en_attente }}</div><div class="stat-label">En attente</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:{% if profile.valide %}rgba(16,185,129,.15){% else %}rgba(239,68,68,.15){% endif %}"><i class="fas fa-{% if profile.valide %}check-circle{% else %}hourglass-half{% endif %}" style="color:{% if profile.valide %}#10b981{% else %}#ef4444{% endif %}"></i></div><div><div class="stat-number">{% if profile.valide %}✅{% else %}⏳{% endif %}</div><div class="stat-label">Statut compte</div></div></div>
+  </div>
+  <div class="card"><h3><i class="fas fa-briefcase"></i> Mes offres</h3>
+    {% if offres %}<div style="overflow-x:auto"><table class="table">
+      <thead><tr><th>Titre</th><th>Type</th><th>Durée</th><th>Date limite</th><th>Candidatures</th><th>Statut</th><th>Actions</th></tr></thead>
+      <tbody>{% for o in offres %}<tr>
+        <td><strong>{{ o.titre }}</strong></td>
+        <td><span class="badge badge-{{ o.type_stage|lower }}">{{ o.get_type_stage_display }}</span></td>
+        <td>{{ o.duree }} mois</td>
+        <td style="color:var(--text-muted);font-size:.82rem">{{ o.date_limite|date:"d/m/Y" }}</td>
+        <td><a href="/offres/{{ o.pk }}/candidatures/" class="badge badge-en_cours" style="cursor:pointer">{{ o.candidatures.count }} candidature(s)</a></td>
+        <td><span class="badge {% if o.publie %}badge-acceptee{% else %}badge-refusee{% endif %}">{% if o.publie %}Publiée{% else %}Archivée{% endif %}</span></td>
+        <td style="display:flex;gap:.4rem">
+          <a href="/offres/{{ o.pk }}/modifier/" class="btn-secondary" style="padding:.3rem .7rem;font-size:.78rem"><i class="fas fa-edit"></i></a>
+          <a href="/offres/{{ o.pk }}/supprimer/" class="btn-danger" style="padding:.3rem .7rem;font-size:.78rem" onclick="return confirm('Supprimer ?')"><i class="fas fa-trash"></i></a>
+        </td>
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}<p style="color:var(--text-muted);text-align:center;padding:2rem">Aucune offre publiée.</p>{% endif %}
+  </div>
+  <div class="card"><h3><i class="fas fa-clock"></i> Candidatures récentes</h3>
+    {% if candidatures_recentes %}
+    {% for c in candidatures_recentes %}<div class="activity-item">
+      <div class="activity-avatar">{{ c.etudiant.first_name|first }}{{ c.etudiant.last_name|first }}</div>
+      <div style="flex:1"><div style="font-weight:600;font-size:.88rem">{{ c.etudiant.get_full_name }}</div>
+      <div style="color:var(--text-muted);font-size:.78rem">{{ c.offre.titre }}</div></div>
+      <span class="badge badge-{{ c.statut|lower }}">{{ c.get_statut_display }}</span>
+      <a href="/candidatures/{{ c.pk }}/traiter/" class="btn-secondary" style="padding:.3rem .7rem;font-size:.78rem;margin-left:.5rem"><i class="fas fa-edit"></i></a>
+    </div>{% endfor %}
+    {% else %}<p style="color:var(--text-muted);text-align:center;padding:1.5rem">Aucune candidature reçue.</p>{% endif %}
+  </div>
+</main></div>{% endblock %}
